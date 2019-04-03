@@ -1,0 +1,3 @@
+[submodule "face_classification"]
+	path = face_classification
+	url = git@github.com:ktran9891/face_classification.git
