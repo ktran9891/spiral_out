@@ -1,3 +1,4 @@
+import numpy as np
 from keras import backend as K
 
 
@@ -10,61 +11,68 @@ class LossEvaluator(object):
     requires separate functions for loss and gradients,
     but computing them separately would be inefficient.
     '''
-    def __init__(self, model, content_layer='block5_conv2', style_layers=None):
+    def __init__(self, model, img_dims, combo_image,
+                 content_weight=0.025, style_weight=1., total_variation_weight=1.,
+                 content_layer='block5_conv2', style_layers=None):
         if style_layers is None:
-            style_layers = ['block1_conv1', 'block2_conv1',
-                              'block3_conv1', 'block4_conv1',
-                              'block5_conv1']
+            style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
+                            'block4_conv1', 'block5_conv1']
 
         # User-specificed attributes
+        self.model = model
+        self.img_dims = img_dims
+        self.combo_image = combo_image
+        self.content_weight = content_weight
+        self.style_weight = style_weight
+        self.total_variation_weight = total_variation_weight
         self.content_layer = content_layer
         self.style_layers = style_layers
-        self.model = model
 
         # Set attributes
         self.loss_value = None
         self.grads_values = None
 
         # Calculated attributes
-        self.loss = self.define_loss()
-        self.f_outputs = self.get_gradients()
+        self.set_loss_tensor()
+        self.set_gradients()
 
 
-    def define_loss_tensor(self):
+    def set_loss_tensor(self):
         # get the symbolic outputs of each "key" layer (we gave them unique names).
-        outputs_dict = dict([(layer.name, layer.output) for layer in model.layers])
+        outputs_dict = dict([(layer.name, layer.output) for layer in self.model.layers])
 
         # compute the neural style loss
         loss = K.variable(0.)
         layer_features = outputs_dict[self.content_layer]
         base_image_features = layer_features[0, :, :, :]
         combination_features = layer_features[2, :, :, :]
-        loss += content_weight * content_loss(base_image_features,
-                                              combination_features)
+        loss += self.content_weight * content_loss(base_image_features,
+                                                   combination_features)
 
         for layer_name in self.style_layers:
             layer_features = outputs_dict[layer_name]
             style_reference_features = layer_features[1, :, :, :]
             combination_features = layer_features[2, :, :, :]
-            sl = style_loss(style_reference_features, combination_features)
-            loss += (style_weight / len(self.style_layers)) * sl
-        loss += total_variation_weight * total_variation_loss(combination_image)
+            sl = style_loss(style_reference_features, combination_features, self.img_dims)
+            loss += (self.style_weight / len(self.style_layers)) * sl
+        loss += self.total_variation_weight * total_variation_loss(self.combo_image, self.img_dims)
         self.loss_tensor = loss
 
 
-    def get_gradients(self):
+    def set_gradients(self):
         # get the gradients of the generated image wrt the loss
-        grads = K.gradients(self.loss_tensor, combination_image)
+        grads = K.gradients(self.loss_tensor, self.combo_image)
         outputs = [self.loss_tensor]
         if isinstance(grads, (list, tuple)):
             outputs += grads
         else:
             outputs.append(grads)
-        f_outputs = K.function([combination_image], outputs)
+        f_outputs = K.function([self.combo_image], outputs)
         self.f_outputs = f_outputs
 
 
     def eval_loss_and_grads(self, x):
+        img_nrows, img_ncols = self.img_dims
         if K.image_data_format() == 'channels_first':
             x = x.reshape((1, 3, img_nrows, img_ncols))
         else:
@@ -108,7 +116,7 @@ def gram_matrix(x):
     return gram
 
     
-def style_loss(style, combination):
+def style_loss(style, combination, img_dims):
     '''
     the "style loss" is designed to maintain
     the style of the reference image in the generated image.
@@ -118,6 +126,7 @@ def style_loss(style, combination):
     '''
     assert K.ndim(style) == 3
     assert K.ndim(combination) == 3
+    img_nrows, img_ncols = img_dims
     
     S = gram_matrix(style)
     C = gram_matrix(combination)
@@ -135,12 +144,14 @@ def content_loss(base, combination):
     return K.sum(K.square(combination - base))
 
 
-def total_variation_loss(x):
+def total_variation_loss(x, img_dims):
     '''
     the 3rd loss function, total variation loss,
     designed to keep the generated image locally coherent (no big changes)
     '''
     assert K.ndim(x) == 4
+    img_nrows, img_ncols = img_dims
+
     if K.image_data_format() == 'channels_first':
         a = K.square(x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :, 1:, :img_ncols - 1])
         b = K.square(x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :, :img_nrows - 1, 1:])
