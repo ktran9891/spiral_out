@@ -8,7 +8,7 @@ function output = getBiconcept( image )
 % cd ..;
 
     if ~isdeployed
-        addpath 'vlfeat-0.9.16\toolbox';
+        addpath 'vlfeat-0.9.16/toolbox';
         run vl_setup;
     end
 
@@ -140,10 +140,10 @@ fclose(fileID);
 for tempj=1:classnum
     currentClass=classes{tempj};
     try
-        load(['SVM\' currentClass '.mat']);
+        load(['SVM/' currentClass '.mat']);
     catch exception
     end
-    [predict_label, accuracy, dec_values] = predict(label_descriptortest, inst_descriptortest, modelfusion,'-b 1');
+    [predict_label, accuracy, dec_values] = svmpredict(label_descriptortest, inst_descriptortest, modelfusion,'-b 1');
     biconceptVector(tempj,1)=dec_values(1);
 end
 %biconceptVector = normc(biconceptVector);
@@ -151,6 +151,3 @@ save(['result\' image(1:end-4) '-biconcept.mat'],'biconceptVector');
 dlmwrite(['result\' image(1:end-4) '-biconcept.txt'],biconceptVector, ' ');
 delete(targetFile)
 end
-
-
-

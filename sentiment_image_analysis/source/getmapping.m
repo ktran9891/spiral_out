@@ -1,4 +1,4 @@
-%GETMAPPING returns a structure containing a mapping table for LBP codes.
+%GETMAvPPING returns a structure containing a mapping table for LBP codes.
 %  MAPPING = GETMAPPING(SAMPLES,MAPPINGTYPE) returns a 
 %  structure containing a mapping table for
 %  LBP codes in a neighbourhood of SAMPLES sampling
@@ -17,7 +17,7 @@
 
 function mapping = getmapping(samples,mappingtype)
 % Version 0.1.1
-% Authors: Marko Heikkilä and Timo Ahonen
+% Authors: Marko Heikkilï¿½ and Timo Ahonen
 
 % Changelog
 % 0.1.1 Changed output to be a structure
@@ -34,7 +34,9 @@ index   = 0;
 if strcmp(mappingtype,'u2') %Uniform 2
   newMax = samples*(samples-1) + 3; 
   for i = 0:2^samples-1
-    j = bitset(bitshift(i,1,samples),1,bitget(i,samples)); %rotate left
+    
+      j = bitset(bitshift(i, samples), 1, bitget(i, samples)); %rotate left
+      %j = bitset(bitshift(i, 1, samples), 1, bitget(i, samples));
     numt = sum(bitget(bitxor(i,j),1:samples)); %number of 1->0 and
                                                %0->1 transitions
                                                %in binary string 
