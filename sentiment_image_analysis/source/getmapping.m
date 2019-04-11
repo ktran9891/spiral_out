@@ -34,9 +34,22 @@ index   = 0;
 if strcmp(mappingtype,'u2') %Uniform 2
   newMax = samples*(samples-1) + 3; 
   for i = 0:2^samples-1
-    
-      j = bitset(bitshift(i, samples), 1, bitget(i, samples)); %rotate left
-      %j = bitset(bitshift(i, 1, samples), 1, bitget(i, samples));
+
+      % Newer matlab takes only strings, not integers. Convert here.
+      if samples == 8
+        assumed_type = 'uint8';
+      elseif samples == 16
+        assumed_type = 'uint16';
+      elseif samples == 32
+        assumed_type = 'uint32';
+      elseif samples == 64
+        assumed_type = 'uint64';
+      else
+        assumed_type = 'uint8';
+      end
+
+      %j = bitset(bitshift(i,1,samples),1,bitget(i,samples)); %rotate left
+      j = bitset(bitshift(i, 1, assumed_type), 1, bitget(i, samples)); %rotate left
     numt = sum(bitget(bitxor(i,j),1:samples)); %number of 1->0 and
                                                %0->1 transitions
                                                %in binary string 
@@ -58,8 +71,21 @@ if strcmp(mappingtype,'ri') %Rotation invariant
     rm = i;
     r  = i;
     for j = 1:samples-1
-      r = bitset(bitshift(r,1,samples),1,bitget(r,samples)); %rotate
-                                                             %left
+
+      % Newer matlab takes only strings, not integers. Convert here.
+      if samples == 8
+        assumed_type = 'uint8';
+      elseif samples == 16
+        assumed_type = 'uint16';
+      elseif samples == 32
+        assumed_type = 'uint32';
+      elseif samples == 64
+        assumed_type = 'uint64';
+      else
+        assumed_type= 'uint8';
+      end
+
+      r = bitset(bitshift(r, 1, assumed_type), 1, bitget(r,samples)); % rotate left
       if r < rm
         rm = r;
       end
