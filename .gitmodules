@@ -1,3 +1,3 @@
 [submodule "sentiment_image_analysis/keras-resnet"]
-	path = sentiment_image_analysis/keras-resnet
+	path = sentiment_classification/keras-resnet
 	url = git@github.com:ktran9891/keras-resnet.git
