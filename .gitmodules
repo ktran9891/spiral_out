@@ -1,3 +1,0 @@
-[submodule "sentiment_image_analysis/libsvm"]
-	path = sentiment_image_analysis/libsvm
-	url = git@github.com:cjlin1/libsvm.git

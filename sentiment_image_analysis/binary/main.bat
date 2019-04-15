@@ -1,1 +1,0 @@
-getBiconcept test.jpg

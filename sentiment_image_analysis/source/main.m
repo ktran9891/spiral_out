@@ -1,1 +1,0 @@
-SentiBank('test.jpg')
