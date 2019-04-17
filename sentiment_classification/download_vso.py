@@ -48,9 +48,9 @@ def parse_anp_images(anp_file_name):
 
     # Save the images
     for i, img in enumerate(train_imgs):
-        cv2.imwrite(training_dir + '%s_%s_%i.jpg' % (adj, noun, i), img)
+        cv2.imwrite(training_dir + '%s/%s_%i.jpg' % (adj, noun, i), img)
     for i, img in enumerate(test_imgs):
-        cv2.imwrite(test_dir + '%s_%s_%i.jpg' % (adj, noun, i), img)
+        cv2.imwrite(test_dir + '%s/%s_%i.jpg' % (adj, noun, i), img)
 
 
 # Download and split all images for all ANPs
