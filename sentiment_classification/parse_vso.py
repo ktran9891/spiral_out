@@ -1,9 +1,9 @@
 import os
-import gc
 import tempfile
 import urllib
 import cv2
-import numpy as np
+import pickle
+import multiprocess
 import pandas as pd
 from tqdm import tqdm
 
@@ -13,9 +13,7 @@ vso_dir = './vso/'
 pickle_dir = './parsed_vso/'
 
 
-# Get the ANP from the file names
-file_names = os.listdir(vso_dir)
-for anp_file_name in tqdm(file_names, desc='ANPs'):
+def parse_anp_images(anp_file_name):
     adj = anp_file_name.split('_')[0]
     noun = anp_file_name.split('_')[1].split('.')[0]
 
@@ -24,19 +22,20 @@ for anp_file_name in tqdm(file_names, desc='ANPs'):
     urls = []
     with open(vso_dir + anp_file_name, 'rb') as file_handle:
         file_lines = file_handle.readlines()
-    for line in tqdm(file_lines, total=len(file_lines), desc='Images for this ANP'):
+    for line in tqdm(file_lines, total=len(file_lines), desc='%s_%s' % (adj, noun)):
         url = str(line).split(' ')[1]
 
         # Write the image to a temporary file and then get the RGB from it
         _, img_path = tempfile.mkstemp()
         try:
-            urllib.urlretrieve(url, img_path)
+            urllib.request.urlretrieve(url, img_path)
             img = cv2.imread(img_path)
+            imgs.append(img)
+            urls.append(url)
 
-            # Ignore broken links
-            if img is not None:
-                imgs.append(img)
-                urls.append(url)
+        # Ignore broken links
+        except urllib.error.HTTPError:
+            pass
 
         # Delete the temporary file
         finally:
@@ -45,16 +44,16 @@ for anp_file_name in tqdm(file_names, desc='ANPs'):
             except OSError:
                 pass
 
-    # Report some 404 errors
-    print('Got %i out of %i images for %s_%s (%i%%)'
-          % (len(imgs), len(file_lines), adj, noun,
-             len(imgs)/len(file_lines)*100.))
-
     # Save the results
-    data_dict = {'URL': urls,
-                 'RGB': imgs}
-    df = pd.DataFrame(data_dict)
-    df.to_pickle(pickle_dir + '%s_%s.pkl' % (adj, noun))
+    data = {'URL': urls,
+            'RGB': imgs}
+    df = pd.DataFrame(data)
+    with open(pickle_dir + '%s_%s.pkl' % (adj, noun), 'wb') as file_handle:
+        pickle.dump(df, file_handle)
 
-    # Collect the garbage just in case we run into memory errors
-    gc.collect()
+
+# Get the ANP from the file names
+file_names = os.listdir(vso_dir)
+with multiprocess.Pool(272) as pool:
+    iterator = pool.imap(parse_anp_images, file_names)
+    list(tqdm(iterator, total=len(file_names), desc='All ANPs'))
