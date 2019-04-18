@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 # Read the catalog
-df = pd.read_csv('catalog.txt', sep='\t', lineterminator='\r')
+df = pd.read_csv('catalog.txt', sep='\t', lineterminator='\r', encoding='ISO-8859-1')
 # Take out the last data point, which is broken for some reason
 df = df.drop([df.shape[0]-1])
 # Rip out the URLs
