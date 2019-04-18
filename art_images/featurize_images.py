@@ -32,7 +32,7 @@ for img_path in tqdm_notebook(img_paths):
 
 # Save features
 h5f = h5py.File('features.h5', 'w')
-foo = h5f.create_dataset('ResNet_features', data=features)
+_ = h5f.create_dataset('ResNet_features', data=features)
 
 # Save the keys
 with open('image_mapping.txt', 'w') as file_handle:
