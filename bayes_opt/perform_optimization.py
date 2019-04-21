@@ -22,7 +22,6 @@ dummy_datagen = ImageDataGenerator()
 dummy_gen = dummy_datagen.flow_from_directory('../sentiment_classification/train/',
                                               class_mode='categorical')
 attr_map = dummy_gen.class_indices
-attr_map
 
 
 def calc_attribute_match(encoded_feature_vector, attribute):
