@@ -16,10 +16,10 @@ urls = df['URL']
 def download_image(index):
     url = urls[index]
     image_url = url.replace('html', 'art', 1).replace('html', 'jpg', 1)
-    urllib.request.urlretrieve(image_url, './images/%05d.jpg' % index)
+    urllib.urlretrieve(image_url, './images/%05d.jpg' % index)
 
 
 # Multithreaded downloading
-with multiprocess.Pool(272, maxtasksperchild=1000) as pool:
-    iterator = pool.imap(download_image, range(len(urls)))
-    list(tqdm(iterator, total=len(urls)))
+pool = multiprocess.Pool(4, maxtasksperchild=1000)
+iterator = pool.imap(download_image, range(len(urls)))
+list(tqdm(iterator, total=len(urls)))
