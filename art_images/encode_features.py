@@ -63,6 +63,6 @@ encoder.save('encoder.h5')
 
 # And then save the encoded features
 encoded_features = encoder.predict(features)
-h5f = h5py.File('features.h5', 'w')
+h5f = h5py.File('features.h5', 'a')
 h5f.create_dataset('encoded_features', data=features)
 h5f.close()

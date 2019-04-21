@@ -43,7 +43,7 @@ for img_path in tqdm(img_paths):
 features = np.array(features)
 
 # Save features
-h5f = h5py.File('features.h5', 'w')
+h5f = h5py.File('features.h5', 'a')
 h5f.create_dataset('ResNet_features', data=features)
 h5f.close()
 
