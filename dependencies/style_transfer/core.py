@@ -13,7 +13,7 @@ def transfer_style(content_file_name, style_file_name, iterations=20,
                    content_weight=0.025, total_variation_weight=1.0,
                    style_weight=1.0, content_layer= 'block5_conv2',
                    style_layers=None, result_folder='./images',
-                   img_nrows=400):
+                   img_nrows=400, show=True):
     if style_layers is None:
         style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
                         'block4_conv1', 'block5_conv1']
@@ -22,7 +22,8 @@ def transfer_style(content_file_name, style_file_name, iterations=20,
     # the model will be loaded with pre-trained ImageNet weights
     model, combo_image, img_dims = compile_model(content_file_name,
                                                  style_file_name,
-                                                 img_nrows=img_nrows)
+                                                 img_nrows=img_nrows,
+                                                 show=show)
     evaluator = LossEvaluator(model, combo_image=combo_image,
                               content_weight=content_weight,
                               style_weight=style_weight,
@@ -50,14 +51,16 @@ def transfer_style(content_file_name, style_file_name, iterations=20,
         end_time = time.time()
         print('Iteration %d completed in %ds' % (i, end_time - start_time))
 
-    show_image(fname)
+    if show:
+        show_image(fname)
     return fname
 
 
-def compile_model(content_file_name, style_file_name, img_nrows):
+def compile_model(content_file_name, style_file_name, img_nrows, show=True):
     # Display the images for checking
-    show_image(content_file_name)
-    show_image(style_file_name)
+    if show:
+        show_image(content_file_name)
+        show_image(style_file_name)
 
     # Parse the images into tensor, then feed the tensor into vgg19
     input_tensor, combo_image, img_dims = parse_images(content_file_name, style_file_name, img_nrows)
