@@ -12,7 +12,7 @@ from dragonfly import maximise_function
 from style_transfer import transfer_style
 
 
-# Hyperparametercs
+# Hyperparameters
 seed_image = './experimental_results/me.jpg'
 attribute = 'happy'
 max_capital = 10
