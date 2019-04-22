@@ -44,7 +44,7 @@ def train_encoder(x_train, x_validate,
     return autoencoder, encoder
 
 # Train shallow [auto]encoder
-n_latent_vars = 4
+n_latent_vars = 16
 autoencoder, encoder = train_encoder(x_train=features_train,
                                      x_validate=features_validate,
                                      n_latent_vars=n_latent_vars,
@@ -65,7 +65,7 @@ encoder.save('encoder.h5')
 encoded_features = encoder.predict(features)
 h5f = h5py.File('features.h5', 'a')
 try:
-    h5f.create_dataset('encoded_features', data=features)
+    h5f.create_dataset('encoded_features', data=encoded_features)
 except RuntimeError:
     h5_data = h5f['encoded_features']
     h5_data = features
