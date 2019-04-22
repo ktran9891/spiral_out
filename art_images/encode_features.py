@@ -65,8 +65,8 @@ encoder.save('encoder.h5')
 encoded_features = encoder.predict(features)
 h5f = h5py.File('features.h5', 'a')
 try:
-    h5f.create_dataset('encoded_features', data=encoded_features)
-except RuntimeError:
-    h5_data = h5f['encoded_features']
-    h5_data = features
+    del h5f['encoded_features']
+except KeyError:
+    pass
+h5f.create_dataset('encoded_features', data=encoded_features)
 h5f.close()

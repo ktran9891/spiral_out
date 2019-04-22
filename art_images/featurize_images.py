@@ -44,6 +44,10 @@ features = np.array(features)
 
 # Save features
 h5f = h5py.File('features.h5', 'a')
+try:
+    del h5f['ResNet_features']
+except KeyError:
+    pass
 h5f.create_dataset('ResNet_features', data=features)
 h5f.close()
 
