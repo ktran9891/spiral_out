@@ -132,4 +132,4 @@ max_val, max_pt, history = maximise_function(lambda features: calc_attribute_mat
 # Save it before we lose it!
 seed_name = seed_image.split('.')[0]
 with open('history_for_%s_%s.pkl' % (attribute, seed_name), 'wb') as file_handle:
-    pickle.dump((max_val, history), file_handle)
+    pickle.dump((max_val, history, style_images), file_handle)
