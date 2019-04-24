@@ -12,11 +12,9 @@ from dragonfly import maximise_function
 from style_transfer import transfer_style
 
 
-# Hyperparameters
-seed_image = './experimental_results/me.jpg'
-attribute = 'happy'
-max_capital = 10
-
+seed_image = sys.argv[1]
+attribute = sys.argv[2]
+max_capital = 80
 
 # Data and results folders
 experiment_folder = ('./experimental_results/%s_%s/'
