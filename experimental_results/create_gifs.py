@@ -1,11 +1,10 @@
 import os
 import imageio
-from tqdm import tqdm_notebook
 
 
 # Find each ANP
 folders = [folder for folder in os.listdir('.') if '.' not in folder]
-for folder in tqdm_notebook(folders, desc='ANP'):
+for folder in folders:
 
     # Find each style transfer iteration
     subfolders = [os.path.join(folder, subfolder)
@@ -14,7 +13,7 @@ for folder in tqdm_notebook(folders, desc='ANP'):
     subfolders.sort()
 
     # Find each image
-    file_paths = [os.path.join(subfolder, image_path)
+    file_paths = [os.path.join(subfolder, file_path)
                   for subfolder in subfolders
                   for file_path in os.listdir(subfolder)]
     file_paths.sort()
