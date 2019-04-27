@@ -7,7 +7,7 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 
 # Download ResNet
-base_model = load_model('../sentiment_classification/resnet50_vso.h5')
+base_model = load_model('../WikiArt-Emotions/resnet50.h5')
 
 # Create a function to pull out the features from ResNet
 model = Model(inputs=base_model.input,
@@ -20,7 +20,7 @@ img_names = [img_name for img_name in os.listdir(img_folder)]
 # Ignore some irrelevant and buggy images
 img_names.remove('.gitignore')
 img_names.remove('04620.jpg')
-img_names.remove('14889.jpg')  
+img_names.remove('14889.jpg')
 img_names.remove('11243.jpg')
 
 # Concatenate folder in front of file names
