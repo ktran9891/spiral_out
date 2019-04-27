@@ -2,19 +2,35 @@ import os
 import sys
 import copy
 import pickle
+import pandas as pd
 import h5py
 import numpy as np
 from scipy import spatial
-from keras.models import load_model
-from keras.preprocessing import image
-from keras.preprocessing.image import ImageDataGenerator
 from dragonfly import maximise_function
 from style_transfer import transfer_style
 
 
+# Input arguments
 seed_image = sys.argv[1]
 attribute = sys.argv[2]
-max_capital = 80
+# Default capital is 50
+try:
+    max_capital = sys.argv[3]
+except IndexError:
+    max_capital = 50
+# Default GPU is number 0
+try:
+    gpu_no = sys.argv[4]
+except IndexError:
+    gpu_no = 0
+    os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_no)
+
+# Load keras after we set the GPU
+from keras.models import load_model
+from keras.preprocessing import image
+from keras.preprocessing.image import ImageDataGenerator
+
 
 # Data and results folders
 experiment_folder = ('./experimental_results/%s_%s/'
@@ -26,19 +42,20 @@ except OSError:
 art_folder = './art_images/'
 
 # Load the classifier
-classifier = load_model('./sentiment_classification/resnet50_vso.h5')
+classifier = load_model('./WikiArt-Emotions/resnet50.h5')
 
-# Initialize a dummy data generator so we can get our attribute labeling map
-dummy_datagen = ImageDataGenerator()
-dummy_gen = dummy_datagen.flow_from_directory('./sentiment_classification/train/',
-                                              class_mode='categorical')
-attr_map = dummy_gen.class_indices
+# Figure out all the responses we're dealing with so we can make an attribute labeling map
+df = pd.read_pickle('./WikiArt-Emotions/data.pkl')
+responses = list(df.columns)
+responses.remove('Image URL')
+responses.sort()
+attr_map = {response: i for i, response in enumerate(responses)}
 
 
 def calc_attribute_match(encoded_feature_vector, attribute):
     # Perform style transfer
     update_style(encoded_feature_vector)
-    
+
     # Use ResNet to classify the current image after style transfer
     global current_image
     probs = predict_adj_matches(current_image)
@@ -92,7 +109,7 @@ def predict_adj_matches(img_path):
     array -= np.mean(array, axis=2, keepdims=True)
     array /= (np.std(array, axis=2, keepdims=True) + 1e-7)
     array_expanded = np.expand_dims(array, axis=0)
-    
+
     # Feed the image to our trained ResNet model
     probabilities = classifier.predict(array_expanded)[0, :]
     return probabilities
