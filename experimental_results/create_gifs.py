@@ -3,7 +3,8 @@ import imageio
 
 
 # Find each ANP
-folders = [folder for folder in os.listdir('.') if '.' not in folder]
+folders = [folder for folder in os.listdir('.')
+           if '.' not in folder and folder != 'archive']
 for folder in folders:
 
     # Find each style transfer iteration
