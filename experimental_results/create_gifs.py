@@ -25,8 +25,9 @@ file_paths = [os.path.join(subfolder, file_path)
               for file_path in os.listdir(subfolder)]
 file_paths.sort()
 
-# Start the GIF with the native image
-images = [imageio.imread(seed) for _ in range(int(fps))]
+## Start the GIF with the native image
+#images = [imageio.imread(seed) for _ in range(int(fps))]
 # Add the style transfer images to the GIF
+images = []
 images.extend([imageio.imread(path) for path in file_paths])
 imageio.mimsave(folder + '.gif', images, fps=fps)
